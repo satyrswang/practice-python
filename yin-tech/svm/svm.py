@@ -55,7 +55,7 @@ def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
         for i in range(m):# 对每条记录进行更新
          #   print "i",i,type(labelMat)
             fXi = float(multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[i,:].T)) + b
-         #   print "multiply(alphas,labelMat).T",multiply(alphas,labelMat).T,dataMatrix[i,:]
+            print "multiply(alphas,labelMat).T",multiply(alphas,labelMat).T,dataMatrix[i,:]
          #   print "dataMatrix*dataMatrix[i,:].T",dataMatrix*dataMatrix[i,:].T
         #    print fXi
             Ei = fXi - float(labelMat[i])

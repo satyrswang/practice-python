@@ -55,7 +55,18 @@ def part(s,fir,last):
     s[pos],s[last]=s[last],s[pos]    
     return pos
   
-    
+#coding:utf-8
+def quicksort(list):
+    if len(list)<2:
+        return list
+    else:
+        midpivot = list[0]
+        lessbeforemidpivot = [i for i in list[1:] if i<=midpivot]
+        biggerafterpivot = [i for i in list[1:] if i > midpivot]
+        finallylist = quicksort(lessbeforemidpivot)+[midpivot]+quicksort(biggerafterpivot)
+        return finallylist
+
+print quicksort([2,4,6,7,1,2,5])    
 
 #将参数拿进函数就出现问题了    
 #每次partition的时候收尾都不是关于arr的，都有变化
