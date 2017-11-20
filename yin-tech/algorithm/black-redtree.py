@@ -12,8 +12,15 @@ Created on Tue Nov 07 16:53:51 2017
 #Create: 2014/10/06 11:38
 #Digest: Provide a common data struct: Red Black Tree
 ########################################################################
-
+import pdb 
 class RBT(object):
+    def printtree(self,h):
+        if h is not None:
+            
+            self.printtree(h.left)
+            h.printnode()
+            self.printtree(h.right)
+        
     class Node(object):
         '''
         Node used in RBTree
@@ -37,6 +44,9 @@ class RBT(object):
 
         def reduce(self,new_val):
             self.val.extend(new_val)
+        def printnode(self):
+            if self is None: print "..........nil............"
+            print "color,key,val,l,r,N.............", self.color,self.key,self.val,self.left,self.right,self.N
 
     def __init__(self):
         self.root = None
@@ -64,24 +74,51 @@ class RBT(object):
         if not self.is_empty(): 
             self.root.color = False
 
+#    def del_min(self):
+#        if self.is_empty(): 
+#            raise LookupError('Empty Red-Black Tree. Can\'t delete min')
+#        if self.__is_black(self.root.left) and self.__is_black(self.root.right):
+#            self.root.color = True
+#        self.root = self.__del_min(self.root)
+#        if not self.is_empty(): self.root.color = False
     def del_min(self):
-        if self.is_empty(): 
-            raise LookupError('Empty Red-Black Tree. Can\'t delete min')
         if self.__is_black(self.root.left) and self.__is_black(self.root.right):
             self.root.color = True
+        #先将根换为红色
         self.root = self.__del_min(self.root)
-        if not self.is_empty(): self.root.color = False
-
+        if  self.root:
+            self.root.color = False
+        
+  
+   
     def del_max(self):
+        #pdb.set_trace() 
+        print('\n')
+        print 'del_max进入'
+        self.printtree(self.root) 
+        print('\n')
+        print 'self.isempty()进入'
         if self.is_empty():
             raise LookupError('Empty Red-Black Tree. Can\'t delete max')
         if self.__is_black(self.root.left) and self.__is_black(self.root.right):
             self.root.color = True
+            self.printtree(self.root) 
+            print('\n')
+            print 'ifisblack判断退出'
         self.root = self.__del_max(self.root)
+        self.printtree(self.root)
+        print('\n')
+        print 'ifisblack判断退出'
         if not self.is_empty(): self.root.color = False 
+        self.printtree(self.root) 
+        print('\n')
+        print '退出del_max之前'
 
     def size(self):
+       # print "size...............................................",self._size()
         return self.__size(self.root)
+    def printsize(self,h):
+        print "size...............................................",self.__size(h)
 
     def is_empty(self):
         return not self.root
@@ -214,23 +251,60 @@ class RBT(object):
         h.N = self.__size(h.left) + self.__size(h.right) + 1
         return h
 
+#    def __del_min(self,h):
+#        if not h.left: #if h is empty:return None
+#            return None
+#
+#        if self.__is_black(h.left) and self.__is_black(h.left.left):
+#            self.__move_red_left(h)
+#        h.left = self.__del_min(h.left) #Del recursive
+#        return self.__balance(h)
     def __del_min(self,h):
-        if not h.left: #if h is empty:return None
+        if not h.left:
             return None
-
         if self.__is_black(h.left) and self.__is_black(h.left.left):
-            self.__move_red_left(h)
-        h.left = self.__del_min(h.left) #Del recursive
-        return self.__balance(h)
-
+            self.__move_red_left(h)# 根换黑色，两孩子换红色后左旋
+        h.left  =self.__del_min(h.left)  
+        return self.__balance(h)  #不断向上每个父亲节点进行平衡
+    
     def __del_max(self,h):
+       # pdb.set_trace() 
+        if h is not None:
+            print '进入————del——max' 
+            self.printtree(h) 
+            print('\n')
+            print '我先打印h  h.left'
+            h.printnode()
+        if h.left is not None:
+            h.left.printnode()
+            print '我打印完了h  h.left'
+        #self.root.printnode()
         if self.__is_red(h.left): 
+            
+            print '进入了isred判断之后我先打印h  h.left'
+            h.printnode()
+            h.left.printnode()
+            print '我打印完了h  h.left'
+            print('\n')
             h = self.__rotate_right(h)
+            self.printtree(h) 
+            print('\n')
+            print '进入ifisred右旋判断'
         if not h.right: 
+            print 'h.right为空了~~找到了最大值'
+            h.printnode()
             return None
         if self.__is_black(h.right) and self.__is_black(h.right.left):
             h = self.__move_red_right(h)
+            self.printtree(h) 
+            print '告诉你现在的H'
+            h.printnode()
+            print('\n')
+        print '再次进入递归。'
         h.right = self.__del_max(h.right)
+        self.printtree(h) 
+        print('\n')
+        print '退出进入——blance之前'
         return self.__balance(h)
 
     def __delete(self,h,key):
@@ -546,10 +620,15 @@ def test_basic_api():
 def test_advance_api():
     print "==========Testing min max floor ceil above below =========="
     t = RBT()
+    
     print "Test Data: FENGDIJKABCLM"
     test_data = "FENGDIJKABCLM" #from A-N,without H
     for letter in test_data:
         t.put(letter,[ord(letter)]) #Value is [ascii order of letter]
+    t.printtree(t.root)   
+    t.printsize(t.root.left)
+    t.printsize(t.root.right)
+    t.printsize(t.root)
 
     #=====min() and del_min()
     print "==========min() and del_min() test begin!=========="
@@ -566,6 +645,8 @@ def test_advance_api():
     print "Original max():\t%s"%repr(t.max())
     print "run del_max()"
     t.del_max()
+    t.printtree(t.root) 
+   
     print "After del_max:max()\t%s"%repr(t.max())
 
     print "run del_max() again"
@@ -585,11 +666,14 @@ def test_int_api():
     print "Node\tceil\t\tfloor\t\tabove\t\tbelow"
     for P in ['A','B','C','G','H','I','L','M','N']:
         print "%s\t%s\t%s\t%s\t%s"%(P,t.ceil(P),t.floor(P),t.above(P),t.below(P))
-
+    
+    
+    
 if __name__ == '__main__':
     test_basic_api()
     test_advance_api()
     test_int_api()
+    
 #class Node(object):
 #    def __init__(data,parent,left,right,isred = True,isbalck = False):#默认为红
 #        self.data = data
